@@ -1,4 +1,4 @@
-![ChickenJoe](https://user-images.githubusercontent.com/65447570/217230852-f7b27fc3-78f3-43a8-a034-80ebaaa01bb9.jpg)
+![ChickenJoeOD](https://user-images.githubusercontent.com/65447570/217386802-dd6acd42-5610-4b32-a07b-75e9a2c1fcb3.jpg)
 
 # Description
 [Cut to Joe tied to a spit, carried by Pen Guans]  I'm Chicken Joe. Joseph. It's long for Joe.
