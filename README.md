@@ -4,4 +4,5 @@
 [Pen Guan shouts at Joe in native language]
 
 # Resources
-https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html
+**RVSS:** https://github.com/dimitymiller/RVSS_Need4Speed
+**PyTorch** https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html
