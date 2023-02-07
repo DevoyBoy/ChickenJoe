@@ -20,8 +20,7 @@ class SteerDataSet(Dataset):
     
     def __getitem__(self,idx):
         f = self.filenames[idx]        
-        img = cv2.imread(f)
-        
+        img = self.crop(cv2.imread(f))
         if self.transform == None:
             img = self.totensor(img)
         else:
@@ -33,6 +32,12 @@ class SteerDataSet(Dataset):
         sample = {"image":img , "steering":steering}        
         
         return sample
+
+    def crop(self, image):
+        return image[50:,:]
+        
+
+
 
 
 def test():
