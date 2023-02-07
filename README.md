@@ -5,4 +5,5 @@
 
 # Resources
 **RVSS:** https://github.com/dimitymiller/RVSS_Need4Speed
-**PyTorch** https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html
+
+**PyTorch:** https://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html
