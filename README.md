@@ -5,6 +5,9 @@
 
 [Pen Guan shouts at Joe in native language]
 
+Team History:
+"You know, we've known each other way back since, like... yesterday, I think it was."
+
 # Resources
 **RVSS:** https://github.com/dimitymiller/RVSS_Need4Speed
 
