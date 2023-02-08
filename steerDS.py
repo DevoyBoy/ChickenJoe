@@ -6,6 +6,8 @@ import cv2
 from glob import glob
 from os import path
 
+CUTOFF = 0.2
+
 class SteerDataSet(Dataset):
     
     def __init__(self,root_folder,img_ext = ".jpg" , transform=None):
@@ -19,26 +21,34 @@ class SteerDataSet(Dataset):
         return len(self.filenames)
     
     def __getitem__(self,idx):
-        f = self.filenames[idx]        
+        f = self.filenames[idx]       
+
+        # crop top of image
         img = self.crop(cv2.imread(f))
+
         if self.transform == None:
             img = self.totensor(img)
         else:
             img = self.transform(img)   
         
         steering = f.split("/")[-1].split(self.img_ext)[0][6:]
-        steering = np.float32(steering)        
-    
-        sample = {"image":img , "steering":steering}        
-        
+        steering = np.float32(steering)    
+
+        # convert steering angle to classification classes
+        if steering < -CUTOFF:
+            steer = 'left'
+        elif steering > CUTOFF:
+            steer = 'right'
+        else:
+            steer = 'straight'
+
+        sample = {"image":img , "steering":steer}        
+        print(sample)
         return sample
 
     def crop(self, image):
         return image[50:,:]
         
-
-
-
 
 def test():
     transform = transforms.Compose(
