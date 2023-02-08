@@ -32,14 +32,23 @@ class SteerDataSet(Dataset):
             img = self.transform(img)
 
         try:
-            steering = f.split("/")[-1].split(self.img_ext)[0][6:]
-            steering = np.float32(steering)
+            img_name = f.split("/")[-1].split(self.img_ext)[0]
+            steering = img_name[-3:]
+            if '-' in img_name:
+                steering = -1 * np.float32(steering)
+            else:
+                steering = np.float32(steering)
         except:
-            steering = f.split('\\')[-1].split(self.img_ext)[0][6:]
-            steering = np.float32(steering)
+            img_name = f.split("\\")[-1].split(self.img_ext)[0]
+            steering = img_name[-3:]
+            if '-' in img_name:
+                steering = -1*np.float32(steering)
+            else:
+                steering = np.float32(steering)
+
 
         # convert steering angle to classification classes
-        if steering < -CUTOFF:
+        if steering < -1*CUTOFF:
             steer = 0   # left
         elif steering > CUTOFF:
             steer = 1   # right
@@ -53,7 +62,7 @@ class SteerDataSet(Dataset):
 
     def crop_and_resize(self, image):
         cropped_im = image[80:,:]
-        resized_im = cv2.resize(cropped_im, dsize=(64,64),interpolation=cv2.INTER_CUBIC)
+        resized_im = cv2.resize(cropped_im, dsize=(32,32),interpolation=cv2.INTER_CUBIC)
         return resized_im
         
         

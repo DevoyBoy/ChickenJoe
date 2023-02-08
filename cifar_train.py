@@ -22,8 +22,10 @@ class Net(nn.Module):
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(2704, 120)
+        # self.fc1 = nn.Linear(2704, 120)
+        self.fc1 = nn.Linear(5*5*16, 120)
         self.fc2 = nn.Linear(120, 84)
+        # self.fc3 = nn.Linear(84, 10)
         self.fc3 = nn.Linear(84, 3)
 
     def forward(self, x):
@@ -41,6 +43,32 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
+def validation_accuracy(net, testloader):
+
+    for i, data in enumerate(testloader, 0):
+        # get the inputs; data is a list of [inputs, labels]
+        inputs = data['image']
+        labels = data['steering']
+        labels = torch.tensor(labels)
+
+        # print(inputs)
+        print(labels)
+        print(torch.bincount(labels))
+
+        outputs = net(inputs)
+        print(outputs)
+
+        _, predicted = torch.max(outputs, 1)
+        print(predicted)
+
+        acc = torch.sum(predicted==labels)/len(outputs)
+
+        print(acc)
+
+        return acc
+
+
+
 if __name__ == '__main__':
     transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -53,7 +81,7 @@ if __name__ == '__main__':
     ds_test = SteerDataSet(DIR,".jpg",transform)
 
     # select train images
-    ds_train.filenames = ds_train.filenames[0:1500]
+    ds_train.filenames = ds_train.filenames[0:4250]
     print("The dataset contains %d images " % len(ds_train))
     trainloader = DataLoader(ds_train,batch_size=4,shuffle=True)
 
@@ -63,7 +91,7 @@ if __name__ == '__main__':
     #                                           shuffle=True, num_workers=2)
 
     # select test images
-    ds_test.filenames = ds_test.filenames[1500:]
+    ds_test.filenames = ds_test.filenames[4250:]
     print("The dataset contains %d images " % len(ds_test))
     testloader = DataLoader(ds_test,batch_size=len(ds_test),shuffle=True)
 
@@ -72,14 +100,14 @@ if __name__ == '__main__':
     # testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
     #                                          shuffle=False, num_workers=2)
 
-    classes = ('plane', 'car', 'bird', 'cat',
-               'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+    classes = ('left', 'right', 'straight')
 
     if False:
         net = Net()
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
+        val_loss = []
         for epoch in range(10):  # loop over the dataset multiple times
 
             running_loss = 0.0
@@ -105,7 +133,13 @@ if __name__ == '__main__':
                 if (i+1) % 100 == 0:    # print every 2000 mini-batches
                     print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
                     running_loss = 0.0
+
+            # validation loss
+            acc = validation_accuracy(net, testloader)
+            val_loss.append(acc)
+
         print('Finished Training')
+        print(val_loss)
 
         # save
         PATH = './cifar_net.pth'
@@ -113,21 +147,8 @@ if __name__ == '__main__':
 
     # import the model
     net = Net()
-    net.load_state_dict(torch.load('model_1.pth'))
+    net.load_state_dict(torch.load('model_3.pth'))
 
-    for i, data in enumerate(testloader, 0):
-        # get the inputs; data is a list of [inputs, labels]
-        inputs = data['image']
-        labels = data['steering']
-        labels = torch.tensor(labels)
+    validation_accuracy(net, testloader)
 
-        # print(inputs)
-        print(labels)
 
-        outputs = net(inputs)
-        print(outputs)
-
-        _, predicted = torch.max(outputs, 1)
-        print(predicted)
-
-        print(torch.sum(predicted==labels)/len(outputs))
