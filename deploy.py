@@ -54,6 +54,8 @@ print("9")
 print("SIKE!")
 print("GO!")
 
+prev = [0, 1, 2]
+
 try:
     angle = 0
     while True:
@@ -68,11 +70,16 @@ try:
         _, predicted = torch.max(steering, 0)
 
         print(predicted)
+        prev[2] = prev[1]
+        prev[1] = prev[0]
+        prev[0] = predicted
 
-        if predicted == 0:	    # left
-            angle = -0.2
-        elif predicted == 1:	# right
-            angle = 0.2
+        average = np.sum(prev)/3
+
+        if average == 0:	    # left
+            angle = -0.3
+        elif average == 1:	    # right
+            angle = 0.3
         else:			        # straight
             angle = 0
 

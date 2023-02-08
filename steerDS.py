@@ -24,7 +24,7 @@ class SteerDataSet(Dataset):
         f = self.filenames[idx]       
 
         # crop top of image
-        img = self.crop_and_resize(cv2.imread(f))
+        img = self.preprocess(cv2.imread(f))
 
         if self.transform == None:
             img = self.totensor(img)
@@ -55,16 +55,17 @@ class SteerDataSet(Dataset):
         else:
             steer = 2   # straight
 
-        sample = {"image":img , "steering":steer}        
-        # print(sample)
+        sample = {"image":img , "steering":steer} 
 
         return sample
 
-    def crop_and_resize(self, image):
-        cropped_im = image[80:,:]
-        resized_im = cv2.resize(cropped_im, dsize=(32,32),interpolation=cv2.INTER_CUBIC)
-        return resized_im
-        
+    def preprocess(self, image):
+        '''Applies pre-processing to images
+        Crops top of image
+        Resizes to 32x32
+        Applies greyscale
+        '''
+        return cv2.cvtColor(cv2.resize(image[80:,:], dsize=(32,32),interpolation=cv2.INTER_CUBIC), cv2.COLOR_BGR2GRAY)
         
 
 def test():
