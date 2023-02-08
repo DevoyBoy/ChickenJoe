@@ -24,7 +24,7 @@ class SteerDataSet(Dataset):
         f = self.filenames[idx]       
 
         # crop top of image
-        img = self.crop(cv2.imread(f))
+        img = self.crop_and_resize(cv2.imread(f))
 
         if self.transform == None:
             img = self.totensor(img)
@@ -36,24 +36,28 @@ class SteerDataSet(Dataset):
 
         # convert steering angle to classification classes
         if steering < -CUTOFF:
-            steer = 'left'
+            steer = 0   # left
         elif steering > CUTOFF:
-            steer = 'right'
+            steer = 1   # right
         else:
-            steer = 'straight'
+            steer = 2   # straight
 
         sample = {"image":img , "steering":steer}        
         print(sample)
+
         return sample
 
-    def crop(self, image):
-        return image[50:,:]
+    def crop_and_resize(self, image):
+        cropped_im = image[80:,:]
+        resized_im = cv2.resize(cropped_im, dsize=(64,64),interpolation=cv2.INTER_CUBIC)
+        return resized_im
+        
         
 
 def test():
     transform = transforms.Compose(
-    [transforms.ToTensor(),
-     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        [transforms.ToTensor(), 
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     ds = SteerDataSet("/home/will/RVSS_Need4Speed/on_laptop/data/",".jpg",transform)
 
@@ -63,7 +67,10 @@ def test():
     for S in ds_dataloader:
         im = S["image"]    
         y  = S["steering"]
-        
+
+        cv2.imshow('image', np.array(im))
+        cv2.waitKey(0)
+
         print(im.shape)
         print(y)
         break
