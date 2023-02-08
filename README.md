@@ -8,6 +8,15 @@
 Team History:
 "You know, we've known each other way back since, like... yesterday, I think it was."
 
+Team Background:
+"No, I'm not from Shiverpool. Dude, I'm from Lake Michigan."
+
+Favourite Food:
+"Squidito on el stickito"
+
+Team Motivation:
+"Dude, she's totally into you! She called you crap!"
+
 # Resources
 **RVSS:** https://github.com/dimitymiller/RVSS_Need4Speed
 
