@@ -63,7 +63,7 @@ def test():
         [transforms.ToTensor(), 
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-    ds = SteerDataSet("/home/will/RVSS_Need4Speed/on_laptop/data/",".jpg",transform)
+    ds = SteerDataSet("data/",".jpg",transform)
 
     print("The dataset contains %d images " % len(ds))
 
