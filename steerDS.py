@@ -29,10 +29,14 @@ class SteerDataSet(Dataset):
         if self.transform == None:
             img = self.totensor(img)
         else:
-            img = self.transform(img)   
-        
-        steering = f.split("/")[-1].split(self.img_ext)[0][6:]
-        steering = np.float32(steering)    
+            img = self.transform(img)
+
+        try:
+            steering = f.split("/")[-1].split(self.img_ext)[0][6:]
+            steering = np.float32(steering)
+        except:
+            steering = f.split('\\')[-1].split(self.img_ext)[0][6:]
+            steering = np.float32(steering)
 
         # convert steering angle to classification classes
         if steering < -CUTOFF:
@@ -43,7 +47,7 @@ class SteerDataSet(Dataset):
             steer = 2   # straight
 
         sample = {"image":img , "steering":steer}        
-        print(sample)
+        # print(sample)
 
         return sample
 
