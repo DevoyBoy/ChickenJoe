@@ -60,12 +60,11 @@ class SteerDataSet(Dataset):
         return sample
 
     def preprocess(self, image):
-        '''Applies pre-processing to images
-        Crops top of image
-        Resizes to 32x32
-        Applies greyscale
-        '''
-        return cv2.cvtColor(cv2.resize(image[80:,:], dsize=(32,32),interpolation=cv2.INTER_CUBIC), cv2.COLOR_BGR2GRAY)
+        """Applies pre-processing to images
+        - Crops top of image
+        - Resizes to 32x64
+        """
+        return cv2.resize(image[80:,:], dsize=(32,64),interpolation=cv2.INTER_CUBIC)
         
 
 def test():

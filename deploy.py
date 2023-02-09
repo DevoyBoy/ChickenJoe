@@ -24,7 +24,7 @@ class Net(nn.Module):
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(400, 120)
+        self.fc1 = nn.Linear(1040, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 3)
 
@@ -39,7 +39,7 @@ class Net(nn.Module):
 net = Net()
 
 #LOAD NETWORK WEIGHTS HERE
-net.load_state_dict(torch.load('model_4.pth'))
+net.load_state_dict(torch.load('model_7.pth'))
 
 
 transform = transforms.Compose(
@@ -50,16 +50,23 @@ print("GO!")
 
 actions = ['left','right','straight']
 prev = [0, 1, 2, 0, 1]
+counter = 0
 
 try:
     angle = 0
     while True:
+        counter += 1
         # get an image from the the robot
         image = camera.frame
 
+        if counter == 50:
+            cv2.imwrite('before2.jpg', image)
+            cv2.imwrite('after2.jpg', cv2.resize(image[80:,:], dsize=(64,32), interpolation=cv2.INTER_CUBIC))
+
         # apply any image transformations
-        image = transform(cv2.resize(image[80:,:], dsize=(32,32), interpolation=cv2.INTER_CUBIC))
+        image = transform(cv2.resize(image[80:,:], dsize=(64,32), interpolation=cv2.INTER_CUBIC))
         
+
         # pass image through network to get a prediction for the steering angle
         steering = net(image)
         _, predicted = torch.max(steering, 0)
@@ -79,23 +86,10 @@ try:
                 right += 1
 
         # gains
-        Kd = 40 #base wheel speeds, increase to go faster, decrease to go slower
+        Kd = 20 #base wheel speeds, increase to go faster, decrease to go slower
         Ka = 20 #how fast to turn when given an angle
 
-        # update turn angle if predicted corner for 3 consecutive time-steps
-        # if left > 3:	    # left
-        #     angle = -0.5
-        # elif right > 3:	    # right
-        #     angle = 0.5
-        # else:			    # straight
-        #     angle = 0
-        #     # Kd = 40
-        # if predicted == 0:
-        #     angle -= 0.1
-        # elif predicted == 1:
-        #     angle += 0.1
-        # else:
-        #     angle = 0
+        # update turn angle 
         if predicted == 0:
             goal = -0.5
             Kd = 20

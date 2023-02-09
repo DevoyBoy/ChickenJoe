@@ -1,8 +1,8 @@
 import os
 from os import listdir
 
-folder_dir = "data/data_raw"
-counter = 0
+folder_dir = "data/new_new_data/"
+counter = 9000
 
 for image in os.listdir(folder_dir):
     if image.endswith(".jpg"):
@@ -17,4 +17,5 @@ for image in os.listdir(folder_dir):
             new_name = new_name.rjust(14, '0')
 
         print(image + "\t---> " + new_name)
+        # os.rename(folder_dir+image, folder_dir+new_name)
         # TODO: rename image
