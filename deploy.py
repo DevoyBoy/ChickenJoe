@@ -39,22 +39,17 @@ class Net(nn.Module):
 net = Net()
 
 #LOAD NETWORK WEIGHTS HERE
-net.load_state_dict(torch.load('model_3.pth'))
+net.load_state_dict(torch.load('model_4.pth'))
 
 
 transform = transforms.Compose(
     [transforms.ToTensor(), 
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-#countdown before beginning
-print("Get ready...")
-print("10")
-time.sleep(1)
-print("9")
-print("SIKE!")
 print("GO!")
 
-prev = [0, 1, 2]
+actions = ['left','right','straight']
+prev = [0, 1, 2, 0, 1]
 
 try:
     angle = 0
@@ -64,33 +59,60 @@ try:
 
         # apply any image transformations
         image = transform(cv2.resize(image[80:,:], dsize=(32,32), interpolation=cv2.INTER_CUBIC))
-
+        
         # pass image through network to get a prediction for the steering angle
         steering = net(image)
         _, predicted = torch.max(steering, 0)
+        print(actions[predicted])
 
-        print(predicted)
-        prev[2] = prev[1]
-        prev[1] = prev[0]
-        prev[0] = predicted
+        # update previous readings
+        prev.insert(0, predicted)
+        prev.pop()
 
-        average = np.sum(prev)/3
+        # compute majority
+        left = 0
+        right = 0
+        for i in range(len(prev)):
+            if prev[i] == 0:
+                left += 1
+            elif prev[i] == 1:
+                right += 1
 
-        if average == 0:	    # left
-            angle = -0.3
-        elif average == 1:	    # right
-            angle = 0.3
-        else:			        # straight
-            angle = 0
+        # gains
+        Kd = 40 #base wheel speeds, increase to go faster, decrease to go slower
+        Ka = 20 #how fast to turn when given an angle
 
-        angle = np.clip(angle, -0.5, 0.5)
-        Kd = 30 #base wheel speeds, increase to go faster, decrease to go slower
-        Ka = 30 #how fast to turn when given an angle
+        # update turn angle if predicted corner for 3 consecutive time-steps
+        # if left > 3:	    # left
+        #     angle = -0.5
+        # elif right > 3:	    # right
+        #     angle = 0.5
+        # else:			    # straight
+        #     angle = 0
+        #     # Kd = 40
+        # if predicted == 0:
+        #     angle -= 0.1
+        # elif predicted == 1:
+        #     angle += 0.1
+        # else:
+        #     angle = 0
+        if predicted == 0:
+            goal = -0.5
+            Kd = 20
+        elif predicted == 1:
+            goal = 0.5
+            Kd = 20
+        else:
+            goal = 0
+
+        K = 0.3
+        angle += K * (goal - angle)
+
+        # update motor speeds
         left  = int(Kd + Ka*angle)
         right = int(Kd - Ka*angle)
-        
-        print(left, right)
-        ppi.set_velocity(left,right) 
+        print(str(left) + ' ' + str(right))
+        ppi.set_velocity(left,right)
         
         
 except KeyboardInterrupt:    
