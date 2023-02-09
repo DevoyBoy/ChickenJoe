@@ -71,9 +71,9 @@ class SteerDataSet(Dataset):
 def test():
     transform = transforms.Compose(
         [transforms.ToTensor(), 
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+        transforms.Normalize((0.5), (0.5))])
 
-    ds = SteerDataSet("data/",".jpg",transform)
+    ds = SteerDataSet("data/data_raw",".jpg",transform)
 
     print("The dataset contains %d images " % len(ds))
 
@@ -81,9 +81,6 @@ def test():
     for S in ds_dataloader:
         im = S["image"]    
         y  = S["steering"]
-
-        cv2.imshow('image', np.array(im))
-        cv2.waitKey(0)
 
         print(im.shape)
         print(y)

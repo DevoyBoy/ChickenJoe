@@ -11,10 +11,7 @@ from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
 import numpy as np
 
-# DIR = "/home/will/RVSS_Need4Speed/on_laptop/data/"
 DIR = "data/"
-
-# functions to show an image
 
 class Net(nn.Module):
     def __init__(self):
