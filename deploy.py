@@ -12,12 +12,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 
+# gains
+Ka = 20         # how fast to turn when given an angle
+Kn = 1          # how fast it gets to goal angle
+maxTurn = 0.5   # how sharp to take the corners
+
 # stop the robot 
 ppi.set_velocity(0,0)
 print("initialise camera")
 camera = ppi.VideoStreamWidget('http://localhost:8080/camera/get')
 
-#INITIALISE NETWORK HERE
+# INITIALISE NETWORK
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
@@ -38,39 +43,35 @@ class Net(nn.Module):
         return x
 net = Net()
 
-#LOAD NETWORK WEIGHTS HERE
+# LOAD NETWORK WEIGHTS
 net.load_state_dict(torch.load('model_7.pth'))
-
 
 transform = transforms.Compose(
     [transforms.ToTensor(), 
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-print("GO!")
-
 actions = ['left','right','straight']
 prev = [0, 1, 2, 0, 1]
+
+print("GO!")
+startTime = time.time()
 counter = 0
 
 try:
     angle = 0
     while True:
-        counter += 1
+        baseSpeed = 20  # base wheel speeds
+
         # get an image from the the robot
         image = camera.frame
-
-        if counter == 50:
-            cv2.imwrite('before2.jpg', image)
-            cv2.imwrite('after2.jpg', cv2.resize(image[80:,:], dsize=(64,32), interpolation=cv2.INTER_CUBIC))
 
         # apply any image transformations
         image = transform(cv2.resize(image[80:,:], dsize=(64,32), interpolation=cv2.INTER_CUBIC))
         
-
         # pass image through network to get a prediction for the steering angle
         steering = net(image)
         _, predicted = torch.max(steering, 0)
-        print(actions[predicted])
+        # print(actions[predicted])
 
         # update previous readings
         prev.insert(0, predicted)
@@ -85,29 +86,38 @@ try:
             elif prev[i] == 1:
                 right += 1
 
-        # gains
-        Kd = 20 #base wheel speeds, increase to go faster, decrease to go slower
-        Ka = 20 #how fast to turn when given an angle
-
         # update turn angle 
-        if predicted == 0:
-            goal = -0.5
-            Kd = 20
-        elif predicted == 1:
-            goal = 0.5
-            Kd = 20
+        # if predicted == 0:
+        #     goal = -0.5
+        #     baseSpeed -= 10
+        # elif predicted == 1:
+        #     goal = 0.5
+        #     baseSpeed -= 10
+        # else:
+        #     goal = 0
+        if left > 3:
+            goal = -maxTurn
+            baseSpeed -= 10
+        elif right > 3:
+            goal = maxTurn
+            baseSpeed -= 10
         else:
             goal = 0
 
-        K = 0.3
-        angle += K * (goal - angle)
+        angle += Kn*(goal - angle)
 
         # update motor speeds
-        left  = int(Kd + Ka*angle)
-        right = int(Kd - Ka*angle)
-        print(str(left) + ' ' + str(right))
+        left  = int(baseSpeed + Ka*angle)
+        right = int(baseSpeed - Ka*angle)
         ppi.set_velocity(left,right)
+        # print(str(left) + ' ' + str(right))
+
+        counter += 1
+        if time.time() - startTime > 1
+            print(str(counter) + 'inferences')
+            startTime = time.time()
         
         
 except KeyboardInterrupt:    
     ppi.set_velocity(0,0)
+    print('\naverage inferences/s:\t' + str(counter/time.time()))
