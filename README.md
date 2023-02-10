@@ -5,7 +5,7 @@
 
 [Pen Guan shouts at Joe in native language]
 
-Team History:\n
+Team History:
 "You know, we've known each other way back since, like... yesterday, I think it was."
 
 Team Background:
