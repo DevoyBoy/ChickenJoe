@@ -59,10 +59,6 @@ try:
         # get an image from the the robot
         image = camera.frame
 
-        if counter == 50:
-            cv2.imwrite('before2.jpg', image)
-            cv2.imwrite('after2.jpg', cv2.resize(image[80:,:], dsize=(64,32), interpolation=cv2.INTER_CUBIC))
-
         # apply any image transformations
         image = transform(cv2.resize(image[80:,:], dsize=(64,32), interpolation=cv2.INTER_CUBIC))
         
